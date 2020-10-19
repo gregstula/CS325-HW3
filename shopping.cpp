@@ -5,60 +5,13 @@
 #include <algorithm>
 #include <cstdlib>
 #include <fstream>
-#include <iostream>
 #include <vector>
 
-// Original Recursive code:
-// source: geeksforgeeks (https://www.geeksforgeeks.org/0-1-knapsack-problem-dp-10/)
-
-int knapsack(std::vector<int>& prices, std::vector<int>& weights, int capacity, int n)
-{
-
-    // base case
-    if (n == 0 || capacity == 0) return 0;
-
-    // ignore items which weight is more than the capacity
-    // since it cannot be included in the optimal solution
-    if (weights[n] > capacity) {
-        return knapsack(prices, weights, capacity, n - 1);
-    }
-    else {
-        // recusively go through the array and
-        // return the maximum of nth item included, nth item not included
-        return std::max(prices[n] + knapsack(prices, weights, capacity - weights[n], n - 1),
-            knapsack(prices, weights, capacity, n - 1));
-    }
-}
-
 /*
-source: geeksforgeeks (https://www.geeksforgeeks.org/0-1-knapsack-problem-dp-10/)
-In the following recursion tree, K() refers
-to knapSack(). The two parameters indicated in the
-following recursion tree are n and W.
-The recursion tree is for following sample inputs.
-wt[] = {1, 1, 1}, W = 2, val[] = {10, 20, 30}
-                       K(n, W)
-                       K(3, 2)
-                   /            \
-                 /                \
-            K(2, 2)                  K(2, 1)
-          /       \                  /    \
-        /           \              /        \
-       K(1, 2)      K(1, 1)        K(1, 1)     K(1, 0)
-       /  \         /   \          /   \
-     /      \     /       \      /       \
-K(0, 2)  K(0, 1)  K(0, 1)  K(0, 0)  K(0, 1)   K(0, 0)
-Recursion tree for Knapsack capacity 2
-units and 3 items of 1 unit weight.
-
-The recursive solution computes the same sub-problems again and again. K(1, 1) is being evaluated twice.
-The time complexity of this naive recursive solution is exponential (2^n).
-
 Dynamic Programming Technique:
 We can create a table that considers all the possible weights from ‘1’ to ‘M’
 as the columns and weights that can be kept as the rows.
 This is the approach we will use here.
-
 */
 
 // we are also including a parameter to know which item was selected
@@ -144,14 +97,8 @@ int main()
             weights.push_back(tmp);
         }
 
-        for (int p = 0; p < n; p++) {
-            std::cout << prices[p] << " ";
-            std::cout << weights[p] << std::endl;
-        }
-
         // get number of family members
         input >> members;
-        std::cout << members << std::endl;
         int max_total_price = 0;
 
         // find the maximum price of items that can be carried for each family member
@@ -160,7 +107,6 @@ int main()
         std::vector<std::vector<int>> selected(members, std::vector<int>());
         for (int j = 0; j < members; j++) {
             input >> max_capacity;
-            std::cout << max_capacity << std::endl;
             max_total_price = max_total_price + knapsack_dp(prices, weights, selected[j], max_capacity, n);
         }
 
@@ -175,13 +121,11 @@ int main()
             // get current family members selections
             auto curr = selected[j];
 
-            // sort
-            std::sort(curr.begin(), curr.end());
-
-            for (auto&& k : curr) {
+            // reverse iterate so output ascending
+            for (int k = curr.size() - 1; k >= 0; k--) {
                 // find the index of the weight
                 // using C++ iterators
-                auto itr = std::find(weights.begin(),weights.end(), k);
+                auto itr = std::find(weights.begin(), weights.end(), curr[k]);
                 // output index
                 output << distance(weights.begin(), itr) + 1 << " ";
 
